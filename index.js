@@ -465,24 +465,29 @@ app.get("/admin/calendar", authRequired, adminRequired, (req, res) => {
 });
 
 /* -----------------------------
-   SERVE REACT FRONTEND (MUST BE LAST)
------------------------------- */
-
-const path = require("path");
-
-app.use(express.static(path.join(__dirname, "dist")));
-
-app.get('/*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
-});
-
-/* -----------------------------
-   ROOT + START SERVER
+   ROOT ROUTE (must be BEFORE catch-all)
 ------------------------------ */
 
 app.get("/", (req, res) => res.send("API running"));
 
+/* -----------------------------
+   SERVE REACT FRONTEND
+------------------------------ */
+
+const path = require("path");
+app.use(express.static(path.join(__dirname, "dist")));
+
+/* -----------------------------
+   SPA CATCH-ALL (Express 5 compatible)
+------------------------------ */
+
+app.get('/:path(*)', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+});
+
+/* -----------------------------
+   START SERVER
+------------------------------ */
+
 const PORT = process.env.PORT || 4000;
-
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
