@@ -4,9 +4,9 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const db = require("./db");
+const path = require("path");
 
 const SECRET = process.env.SECRET;
-
 const app = express();
 
 app.use(cors());
@@ -400,7 +400,7 @@ app.get("/staff/leave/summary", authRequired, (req, res) => {
 });
 
 /* -----------------------------
-   SUPERVISOR: LEAVE SUMMARY (Correct Version)
+   SUPERVISOR: LEAVE SUMMARY
 ------------------------------ */
 
 app.get("/supervisor/leave/summary", authRequired, (req, res) => {
@@ -474,15 +474,14 @@ app.get("/", (req, res) => res.send("API running"));
    SERVE REACT FRONTEND
 ------------------------------ */
 
-const path = require("path");
 app.use(express.static(path.join(__dirname, "dist")));
 
 /* -----------------------------
    SPA CATCH-ALL (Express 5 compatible)
 ------------------------------ */
 
-app.get('/:path(*)', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+app.get("/:path(*)", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "dist", "index.html"));
 });
 
 /* -----------------------------
