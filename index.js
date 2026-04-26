@@ -477,10 +477,10 @@ app.get("/", (req, res) => res.send("API running"));
 app.use(express.static(path.join(__dirname, "dist")));
 
 /* -----------------------------
-   SPA CATCH-ALL (Express 5 compatible)
+   SPA CATCH-ALL (Express 5 + Node 22 compatible)
 ------------------------------ */
 
-app.get("/:path(*)", (req, res) => {
+app.get("/*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "dist", "index.html"));
 });
 
