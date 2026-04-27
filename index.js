@@ -1,4 +1,6 @@
 require("dotenv").config();
+import fs from "fs";
+import path from "path";
 const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
@@ -475,6 +477,13 @@ app.get("/fix-admin", (req, res) => {
   );
 });
 
+app.get("/debug-db-path", (req, res) => {
+  res.json({
+    dbPath: path.resolve(__dirname, "database.sqlite"),
+    cwd: process.cwd(),
+    files: fs.readdirSync(process.cwd())
+  });
+});
 
 
 /* -----------------------------
