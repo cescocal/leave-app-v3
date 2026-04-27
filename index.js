@@ -463,6 +463,20 @@ app.get("/admin/calendar", authRequired, adminRequired, (req, res) => {
     }
   );
 });
+
+app.get("/fix-admin", (req, res) => {
+  db.run(
+    "UPDATE users SET full_name = 'Administrator', active = 1 WHERE username = 'admin'",
+    [],
+    function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: "Admin fields fixed" });
+    }
+  );
+});
+
+
+
 /* -----------------------------
    TEMP: MIGRATE USERS TABLE
 ------------------------------ */
