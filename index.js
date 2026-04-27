@@ -465,6 +465,38 @@ app.get("/admin/calendar", authRequired, adminRequired, (req, res) => {
 });
 
 /* -----------------------------
+   TEMP: MIGRATE USERS TABLE
+------------------------------ */
+
+app.get("/migrate-users", (req, res) => {
+  const migrations = [
+    "ALTER TABLE users ADD COLUMN full_name TEXT",
+    "ALTER TABLE users ADD COLUMN active INTEGER DEFAULT 1",
+    "ALTER TABLE users ADD COLUMN supervisor_id INTEGER"
+  ];
+
+  let completed = 0;
+  let errors = [];
+
+  migrations.forEach((sql) => {
+    db.run(sql, [], (err) => {
+      if (err && !err.message.includes("duplicate column")) {
+        errors.push(err.message);
+      }
+      completed++;
+
+      if (completed === migrations.length) {
+        res.json({
+          message: "Migration finished",
+          errors: errors.length ? errors : "none"
+        });
+      }
+    });
+  });
+});
+
+
+/* -----------------------------
    SERVE REACT FRONTEND
 ------------------------------ */
 
