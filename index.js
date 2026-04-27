@@ -1,15 +1,18 @@
 require("dotenv").config();
-import fs from "fs";
-import path from "path";
+
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const db = require("./db");
-const path = require("path");
 
 const SECRET = process.env.SECRET;
 const app = express();
+
+/* -----------------------------
+   GLOBAL MIDDLEWARE
+------------------------------ */
 
 app.use(cors());
 app.use(express.json());
@@ -190,7 +193,9 @@ app.post("/leave", authRequired, (req, res) => {
   const { start_date, end_date, leave_type, reason } = req.body;
 
   if (!start_date || !end_date || !leave_type) {
-    return res.status(400).json({ error: "Start date, end date, and leave type are required" });
+    return res
+      .status(400)
+      .json({ error: "Start date, end date, and leave type are required" });
   }
 
   db.run(
@@ -466,6 +471,10 @@ app.get("/admin/calendar", authRequired, adminRequired, (req, res) => {
   );
 });
 
+/* -----------------------------
+   TEMP: FIX ADMIN FIELDS
+------------------------------ */
+
 app.get("/fix-admin", (req, res) => {
   db.run(
     "UPDATE users SET full_name = 'Administrator', active = 1 WHERE username = 'admin'",
@@ -477,14 +486,16 @@ app.get("/fix-admin", (req, res) => {
   );
 });
 
+/* -----------------------------
+   TEMP: DEBUG DB PATH
+------------------------------ */
+
 app.get("/debug-db-path", (req, res) => {
   res.json({
     dbPath: path.resolve(__dirname, "database.sqlite"),
-    cwd: process.cwd(),
-    files: fs.readdirSync(process.cwd())
+    cwd: process.cwd()
   });
 });
-
 
 /* -----------------------------
    TEMP: MIGRATE USERS TABLE
@@ -498,7 +509,7 @@ app.get("/migrate-users", (req, res) => {
   ];
 
   let completed = 0;
-  let errors = [];
+  const errors = [];
 
   migrations.forEach((sql) => {
     db.run(sql, [], (err) => {
@@ -581,7 +592,6 @@ app.get("/reset-admin-password", (req, res) => {
   });
 });
 
-
 /* -----------------------------
    SERVE REACT FRONTEND
 ------------------------------ */
@@ -602,4 +612,3 @@ app.get("/*", (req, res) => {
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
