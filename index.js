@@ -463,24 +463,6 @@ app.get("/admin/calendar", authRequired, adminRequired, (req, res) => {
     }
   );
 });
-/* -----------------------------
-   TEMP: ADD full_name COLUMN IF MISSING
------------------------------- */
-
-app.get("/migrate-add-fullname", (req, res) => {
-  db.run(
-    "ALTER TABLE users ADD COLUMN full_name TEXT",
-    [],
-    (err) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      res.json({ message: "full_name column added successfully" });
-    }
-  );
-});
-
-
 
 /* -----------------------------
    SERVE REACT FRONTEND
