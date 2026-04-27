@@ -1,6 +1,12 @@
 const sqlite3 = require("sqlite3").verbose();
+const path = require("path");
 
-const db = new sqlite3.Database("./database.sqlite", (err) => {
+// FIX: Always use absolute path so Render does NOT create a second DB
+const dbPath = path.join(__dirname, "database.sqlite");
+
+console.log("Using SQLite DB at:", dbPath);
+
+const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error("Failed to connect to SQLite:", err);
   } else {
@@ -9,13 +15,15 @@ const db = new sqlite3.Database("./database.sqlite", (err) => {
 });
 
 db.serialize(() => {
-  // Users table
+  // Users table (updated schema)
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
-      role TEXT NOT NULL
+      role TEXT NOT NULL,
+      full_name TEXT,
+      active INTEGER DEFAULT 1
     )
   `, (err) => {
     if (err) {
@@ -25,14 +33,16 @@ db.serialize(() => {
     }
   });
 
-  // Create default admin user
+  // Default admin user (safe insert)
   db.run(`
-    INSERT OR IGNORE INTO users (id, username, password_hash, role)
+    INSERT OR IGNORE INTO users (id, username, password_hash, role, full_name, active)
     VALUES (
       1,
       'admin',
       '$2b$10$u1x0xJ7p8eQfZqVQ0qzMeOqY8FJwB6g7xYg8YxJ7p8eQfZqVQ0qzMe',
-      'admin'
+      'admin',
+      'Administrator',
+      1
     )
   `);
 
