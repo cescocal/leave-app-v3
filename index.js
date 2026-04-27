@@ -526,6 +526,40 @@ app.get("/init-admin", (req, res) => {
 });
 
 /* -----------------------------
+   TEMP: RESET ADMIN PASSWORD
+------------------------------ */
+
+app.get("/reset-admin-password", (req, res) => {
+  const username = "admin";
+  const newPassword = "Admin@123";
+
+  bcrypt.hash(newPassword, 10, (err, hash) => {
+    if (err) return res.status(500).json({ error: "Hash error" });
+
+    db.run(
+      "UPDATE users SET password_hash = ? WHERE username = ?",
+      [hash, username],
+      function (err) {
+        if (err) {
+          return res.status(500).json({ error: err.message });
+        }
+
+        if (this.changes === 0) {
+          return res.status(404).json({ error: "Admin user not found" });
+        }
+
+        res.json({
+          message: "Admin password reset",
+          username,
+          newPassword
+        });
+      }
+    );
+  });
+});
+
+
+/* -----------------------------
    SERVE REACT FRONTEND
 ------------------------------ */
 
