@@ -463,6 +463,37 @@ app.get("/admin/calendar", authRequired, adminRequired, (req, res) => {
     }
   );
 });
+/* -----------------------------
+   TEMP: CREATE ADMIN USER ON RENDER
+------------------------------ */
+
+app.get("/init-admin", async (req, res) => {
+  const username = "admin";
+  const password = "Admin@123";
+  const full_name = "Administrator";
+  const role = "admin";
+
+  bcrypt.hash(password, 10, (err, hash) => {
+    if (err) return res.status(500).json({ error: "Hash error" });
+
+    db.run(
+      "INSERT INTO users (username, password_hash, role, full_name, active) VALUES (?, ?, ?, ?, 1)",
+      [username, hash, role, full_name],
+      function (err) {
+        if (err) {
+          return res.status(500).json({ error: err.message });
+        }
+
+        res.json({
+          message: "Admin user created",
+          username,
+          password
+        });
+      }
+    );
+  });
+});
+
 
 /* -----------------------------
    SERVE REACT FRONTEND
