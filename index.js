@@ -465,12 +465,6 @@ app.get("/admin/calendar", authRequired, adminRequired, (req, res) => {
 });
 
 /* -----------------------------
-   ROOT ROUTE (must be BEFORE catch-all)
------------------------------- */
-
-app.get("/", (req, res) => res.send("API running"));
-
-/* -----------------------------
    SERVE REACT FRONTEND
 ------------------------------ */
 
@@ -483,6 +477,14 @@ app.use(express.static(path.join(__dirname, "dist")));
 app.get("/*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "dist", "index.html"));
 });
+
+/* -----------------------------
+   OPTIONAL: API ROOT (must be AFTER catch-all)
+------------------------------ */
+
+// If you still want this, put it LAST.
+// But honestly, you don’t need it anymore.
+// app.get("/", (req, res) => res.send("API running"));
 
 /* -----------------------------
    START SERVER
