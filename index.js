@@ -494,6 +494,36 @@ app.get("/migrate-users", (req, res) => {
     });
   });
 });
+/* -----------------------------
+   TEMP: MIGRATE USERS TABLE
+------------------------------ */
+
+app.get("/migrate-users", (req, res) => {
+  const migrations = [
+    "ALTER TABLE users ADD COLUMN full_name TEXT",
+    "ALTER TABLE users ADD COLUMN active INTEGER DEFAULT 1",
+    "ALTER TABLE users ADD COLUMN supervisor_id INTEGER"
+  ];
+
+  let completed = 0;
+  let errors = [];
+
+  migrations.forEach((sql) => {
+    db.run(sql, [], (err) => {
+      if (err && !err.message.includes("duplicate column")) {
+        errors.push(err.message);
+      }
+      completed++;
+
+      if (completed === migrations.length) {
+        res.json({
+          message: "Migration finished",
+          errors: errors.length ? errors : "none"
+        });
+      }
+    });
+  });
+});
 
 /* -----------------------------
    TEMP: CREATE ADMIN USER
@@ -526,7 +556,6 @@ app.get("/init-admin", (req, res) => {
   });
 });
 
-
 /* -----------------------------
    SERVE REACT FRONTEND
 ------------------------------ */
@@ -534,12 +563,13 @@ app.get("/init-admin", (req, res) => {
 app.use(express.static(path.join(__dirname, "dist")));
 
 /* -----------------------------
-   SPA CATCH-ALL (Express 5 + Node 22 compatible)
+   SPA CATCH-ALL
 ------------------------------ */
 
 app.get("/*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "dist", "index.html"));
 });
+
 
 /* -----------------------------
    OPTIONAL: API ROOT (must be AFTER catch-all)
