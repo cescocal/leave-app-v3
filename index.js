@@ -5,7 +5,7 @@ const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const db = require("./db");
+const db = require("./backend/db");
 
 const SECRET = process.env.SECRET;
 const app = express();
